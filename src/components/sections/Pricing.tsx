@@ -120,8 +120,11 @@ export function Pricing() {
                             <Button
                                 className="w-full"
                                 variant={tier.popular ? "default" : "outline"}
+                                asChild
                             >
-                                시작하기
+                                <a href="https://open.kakao.com/o/sfwQbQ6h" target="_blank" rel="noopener noreferrer">
+                                    시작하기
+                                </a>
                             </Button>
                         </div>
                     ))}

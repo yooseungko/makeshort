@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   alternates: {
-    canonical: "https://makeshort.vercel.app",
+    canonical: "https://makeshort.co.kr",
   },
   verification: {
     google: "", // 나중에 Google Search Console 인증 코드 추가

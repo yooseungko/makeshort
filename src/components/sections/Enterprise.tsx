@@ -76,7 +76,7 @@ export function Enterprise() {
                 <div className="max-w-4xl mx-auto mb-16">
                     <div className="glass-strong rounded-2xl overflow-hidden">
                         {/* Table Header */}
-                        <div className="grid grid-cols-4 gap-4 p-4 bg-muted/30 border-b border-border text-sm font-semibold">
+                        <div className="grid grid-cols-4 gap-2 md:gap-4 p-4 bg-muted/30 border-b border-border text-xs md:text-sm font-semibold">
                             <div>보장 조회수</div>
                             <div className="text-center">CPV 단가</div>
                             <div className="text-center">총 비용</div>
@@ -87,31 +87,30 @@ export function Enterprise() {
                         {cpvTiers.map((tier, index) => (
                             <div
                                 key={tier.views}
-                                className={`grid grid-cols-4 gap-4 p-4 items-center border-b border-border/50 last:border-b-0 hover:bg-muted/20 transition-colors ${tier.popular ? "bg-primary/5" : ""
+                                className={`grid grid-cols-4 gap-2 md:gap-4 p-3 md:p-4 items-center border-b border-border/50 last:border-b-0 hover:bg-muted/20 transition-colors ${tier.popular ? "bg-primary/5" : ""
                                     }`}
                             >
-                                <div className="flex items-center gap-2">
-                                    <span className="text-lg font-bold">{tier.views}</span>
-                                    <span className="text-muted-foreground text-sm">조회</span>
+                                <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
+                                    <span className="text-sm md:text-lg font-bold">{tier.views}</span>
                                     {tier.popular && (
-                                        <Badge className="ml-2 text-xs">인기</Badge>
+                                        <Badge className="text-[10px] md:text-xs px-1 md:px-2 py-0 h-4 md:h-5 w-fit">인기</Badge>
                                     )}
                                 </div>
                                 <div className="text-center">
-                                    <span className="text-2xl font-bold gradient-text">{tier.cpv}</span>
-                                    <span className="text-muted-foreground text-sm">/view</span>
+                                    <span className="text-lg md:text-2xl font-bold gradient-text">{tier.cpv}</span>
                                 </div>
                                 <div className="text-center">
-                                    <span className="text-lg font-semibold">{tier.totalPrice}</span>
+                                    <span className="text-xs md:text-lg font-semibold">{tier.totalPrice}</span>
                                 </div>
                                 <div className="text-right">
                                     <Button
                                         size="sm"
                                         variant={tier.popular ? "default" : "outline"}
+                                        className="h-7 test-xs px-2 md:h-9 md:px-4 md:text-sm"
                                         asChild
                                     >
                                         <a href="https://open.kakao.com/o/sfwQbQ6h" target="_blank" rel="noopener noreferrer">
-                                            상담하기
+                                            상담
                                         </a>
                                     </Button>
                                 </div>

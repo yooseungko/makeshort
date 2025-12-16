@@ -25,7 +25,7 @@ export function Footer() {
                     <div>
                         <h4 className="font-semibold mb-4">문의</h4>
                         <ul className="space-y-2 text-sm text-muted-foreground">
-                            <li>contact@makeshort.kr</li>
+                            <li>makeshort99@gmail.com</li>
                             <li>카카오톡: @makeshort</li>
                         </ul>
                     </div>

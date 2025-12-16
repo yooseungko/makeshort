@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "숏폼 제작 전문 메이크숏",
-  description: "틱톡 릴스 쇼츠 숏폼 제작 — 개당 15,000원 고정 단가로 1만~10만 조회수 보장. 기업 맞춤 CPV 개런티 모델까지. 터지는 숏폼을 만들어 드립니다.",
+  description: "틱톡 릴스 쇼츠 숏폼 제작 — 개당 25,000원 고정 단가로 1만~10만 조회수 보장. 기업 맞춤 CPV 개런티 모델까지. 터지는 숏폼을 만들어 드립니다.",
   keywords: ["숏폼", "숏폼 제작", "틱톡 영상", "릴스 제작", "유튜브 쇼츠", "숏폼 에이전시", "바이럴 영상", "영상 편집", "숏폼 광고", "숏폼 마케팅"],
   authors: [{ name: "MakeShort" }],
   creator: "MakeShort",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "숏폼 제작 전문 메이크숏",
-    description: "틱톡 릴스 쇼츠 숏폼 제작 — 개당 15,000원 고정 단가로 1만~10만 조회수 보장. 터지는 숏폼을 만들어 드립니다.",
+    description: "틱톡 릴스 쇼츠 숏폼 제작 — 개당 25,000원 고정 단가로 1만~10만 조회수 보장. 터지는 숏폼을 만들어 드립니다.",
     type: "website",
     locale: "ko_KR",
     siteName: "MakeShort",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "숏폼 제작 전문 메이크숏",
-    description: "틱톡 릴스 쇼츠 숏폼 제작 — 개당 15,000원 고정 단가로 1만~10만 조회수 보장",
+    description: "틱톡 릴스 쇼츠 숏폼 제작 — 개당 25,000원 고정 단가로 1만~10만 조회수 보장",
     images: ["/og-image.png"],
   },
   alternates: {

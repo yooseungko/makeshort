@@ -18,7 +18,7 @@ const pricingTiers: PricingTier[] = [
     {
         name: "베이직",
         description: "간단한 편집이 필요한 분들께",
-        price: "15,000",
+        price: "25,000",
         priceLabel: "원 이상 / 개",
         icon: <Zap className="w-6 h-6" />,
         features: [
@@ -33,7 +33,7 @@ const pricingTiers: PricingTier[] = [
     {
         name: "스탠다드",
         description: "가장 인기있는 선택",
-        price: "25,000",
+        price: "35,000",
         priceLabel: "원 이상 / 개",
         icon: <Sparkles className="w-6 h-6" />,
         popular: true,

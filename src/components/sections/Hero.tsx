@@ -57,7 +57,7 @@ export function Hero() {
 
           {/* Price Preview */}
           <p className="mt-8 text-muted-foreground text-sm">
-            개당 <span className="text-primary font-bold">15,000원</span>부터 시작
+            개당 <span className="text-primary font-bold">25,000원</span>부터 시작
           </p>
         </div>
       </div>

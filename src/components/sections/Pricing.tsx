@@ -19,7 +19,7 @@ const pricingTiers: PricingTier[] = [
         name: "베이직",
         description: "간단한 편집이 필요한 분들께",
         price: "15,000",
-        priceLabel: "원 / 개",
+        priceLabel: "원 이상 / 개",
         icon: <Zap className="w-6 h-6" />,
         features: [
             "기본 컷편집",
@@ -34,7 +34,7 @@ const pricingTiers: PricingTier[] = [
         name: "스탠다드",
         description: "가장 인기있는 선택",
         price: "25,000",
-        priceLabel: "원 / 개",
+        priceLabel: "원 이상 / 개",
         icon: <Sparkles className="w-6 h-6" />,
         popular: true,
         features: [
@@ -43,15 +43,14 @@ const pricingTiers: PricingTier[] = [
             "사운드 이펙트",
             "컬러 그레이딩",
             "썸네일 제작",
-            "무제한 수정",
             "영업일 기준 3일 내 납품",
         ],
     },
     {
         name: "AI 프리미엄",
         description: "AI 영상 제작 포함",
-        price: "35,000",
-        priceLabel: "원 / 개",
+        price: "50,000",
+        priceLabel: "원 이상 / 개",
         icon: <Crown className="w-6 h-6" />,
         features: [
             "AI 영상 생성",
@@ -132,7 +131,7 @@ export function Pricing() {
 
                 <div className="mt-12 text-center">
                     <p className="text-muted-foreground text-sm">
-                        대량 주문 시 추가 할인 가능 · 맞춤 견적은 문의해 주세요
+                        모든 프로젝트는 영상 및 가격 협의 후 진행됩니다.
                     </p>
                 </div>
             </div>

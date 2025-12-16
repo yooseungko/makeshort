@@ -37,7 +37,7 @@ export function Hero() {
           <div className="flex flex-wrap justify-center gap-6 mb-10">
             <div className="glass px-6 py-3 rounded-full flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-foreground/70" />
-              <span className="text-sm">평균 조회수 <strong className="text-primary">50,000+</strong></span>
+              <span className="text-sm">누적 조회수 <strong className="text-primary">1억+</strong></span>
             </div>
             <div className="glass px-6 py-3 rounded-full flex items-center gap-2">
               <Play className="w-5 h-5 text-foreground/70" />

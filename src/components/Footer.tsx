@@ -34,8 +34,12 @@ export function Footer() {
                 <Separator className="my-8" />
 
                 <div className="flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-                    <p>© 2024 MakeShort. All rights reserved.</p>
-                    <div className="flex gap-4 mt-4 md:mt-0">
+                    <div className="text-center md:text-left mb-4 md:mb-0">
+                        <p className="mb-1">테넷컴퍼니 | 대표 고유승, 고유진</p>
+                        <p className="mb-1">사업자등록번호 654-11-02475</p>
+                        <p>© 2024 MakeShort. All rights reserved.</p>
+                    </div>
+                    <div className="flex gap-4">
                         <a href="#" className="hover:text-foreground">이용약관</a>
                         <a href="#" className="hover:text-foreground">개인정보처리방침</a>
                     </div>

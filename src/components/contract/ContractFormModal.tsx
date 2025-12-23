@@ -114,9 +114,9 @@ export function ContractFormModal({ isOpen, onClose, editingContract }: Contract
         setPaymentSchedule(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (editingContract) {
-            updateContract(
+            await updateContract(
                 editingContract.id,
                 customerInfo,
                 quoteItems,
@@ -124,7 +124,7 @@ export function ContractFormModal({ isOpen, onClose, editingContract }: Contract
                 contractTerms
             );
         } else {
-            createContract(customerInfo, quoteItems, paymentSchedule, contractTerms);
+            await createContract(customerInfo, quoteItems, paymentSchedule, contractTerms);
         }
         onClose();
     };
@@ -153,8 +153,8 @@ export function ContractFormModal({ isOpen, onClose, editingContract }: Contract
                         <div key={s} className="flex items-center">
                             <div
                                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${step >= s
-                                        ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
-                                        : 'bg-slate-700 text-slate-400'
+                                    ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
+                                    : 'bg-slate-700 text-slate-400'
                                     }`}
                             >
                                 {s}
@@ -345,8 +345,8 @@ export function ContractFormModal({ isOpen, onClose, editingContract }: Contract
                             <div className="flex justify-between text-sm mb-2">
                                 <span className="text-slate-400">입력 합계</span>
                                 <span className={`font-medium ${paymentSchedule.deposit + paymentSchedule.interim + paymentSchedule.balance === paymentSchedule.total
-                                        ? 'text-green-400'
-                                        : 'text-yellow-400'
+                                    ? 'text-green-400'
+                                    : 'text-yellow-400'
                                     }`}>
                                     {formatCurrency(paymentSchedule.deposit + paymentSchedule.interim + paymentSchedule.balance)}
                                 </span>

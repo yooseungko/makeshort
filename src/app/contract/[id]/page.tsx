@@ -11,19 +11,20 @@ import {
     formatDate
 } from '@/lib/contracts';
 import { Button } from '@/components/ui/button';
-import { FileText, PenTool, CheckCircle, Lock, Eye, ArrowLeft, User, Check } from 'lucide-react';
+import { FileText, PenTool, CheckCircle, Lock, Eye, ArrowLeft, User, Check, Loader2 } from 'lucide-react';
 
-type ViewMode = 'login' | 'menu' | 'quote' | 'contract' | 'sign' | 'complete';
+type ViewMode = 'loading' | 'login' | 'menu' | 'quote' | 'contract' | 'sign' | 'complete';
 
 export default function ContractPage() {
     const params = useParams();
     const contractId = params.id as string;
 
     const [contract, setContract] = useState<Contract | null>(null);
-    const [viewMode, setViewMode] = useState<ViewMode>('login');
+    const [viewMode, setViewMode] = useState<ViewMode>('loading');
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [showContractConfirmModal, setShowContractConfirmModal] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Signature canvas
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -32,19 +33,26 @@ export default function ContractPage() {
 
     useEffect(() => {
         // 계약서 로드
-        const loadedContract = getContractById(contractId);
-        if (loadedContract) {
-            setContract(loadedContract);
+        const loadContract = async () => {
+            const loadedContract = await getContractById(contractId);
+            if (loadedContract) {
+                setContract(loadedContract);
 
-            // 이미 서명된 계약서면 완료 화면으로
-            const currentVersion = loadedContract.versions.find(v => v.version === loadedContract.currentVersion);
-            if (currentVersion?.status === 'signed') {
-                setViewMode('complete');
+                // 이미 서명된 계약서면 완료 화면으로
+                const currentVersion = loadedContract.versions.find(v => v.version === loadedContract.currentVersion);
+                if (currentVersion?.status === 'signed') {
+                    setViewMode('complete');
+                } else {
+                    setViewMode('login');
+                }
+            } else {
+                setViewMode('login');
             }
-        }
+        };
+        loadContract();
     }, [contractId]);
 
-    const handlePasswordSubmit = (e: React.FormEvent) => {
+    const handlePasswordSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!contract) return;
@@ -130,21 +138,40 @@ export default function ContractPage() {
         setHasSignature(false);
     };
 
-    const handleSignContract = () => {
+    const handleSignContract = async () => {
         const canvas = canvasRef.current;
         if (!canvas || !contract) return;
 
-        const signatureData = canvas.toDataURL('image/png');
-        signContract(contract.id, signatureData);
+        setIsSubmitting(true);
+        try {
+            const signatureData = canvas.toDataURL('image/png');
+            await signContract(contract.id, signatureData);
 
-        // 계약서 다시 로드
-        const updatedContract = getContractById(contract.id);
-        if (updatedContract) {
-            setContract(updatedContract);
+            // 계약서 다시 로드
+            const updatedContract = await getContractById(contract.id);
+            if (updatedContract) {
+                setContract(updatedContract);
+            }
+
+            setViewMode('complete');
+        } catch (error) {
+            console.error('Error signing contract:', error);
+        } finally {
+            setIsSubmitting(false);
         }
-
-        setViewMode('complete');
     };
+
+    // 로딩 화면
+    if (viewMode === 'loading') {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+                <div className="text-center">
+                    <Loader2 className="w-12 h-12 mx-auto text-violet-400 animate-spin mb-4" />
+                    <p className="text-slate-400">로딩 중...</p>
+                </div>
+            </div>
+        );
+    }
 
     if (!contract) {
         return (

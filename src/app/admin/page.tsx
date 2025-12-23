@@ -12,7 +12,7 @@ import {
     DEFAULT_CONTRACT_TERMS
 } from '@/lib/contracts';
 import { ContractFormModal } from '@/components/contract/ContractFormModal';
-import { FileText, Plus, Eye, Edit, Trash2, Copy, CheckCircle, Clock, XCircle, Lock } from 'lucide-react';
+import { FileText, Plus, Eye, Edit, Trash2, Copy, CheckCircle, Clock, XCircle, Lock, Loader2 } from 'lucide-react';
 
 // 관리자 비밀번호
 const ADMIN_PASSWORD = 'makeshort2024';
@@ -25,6 +25,7 @@ export default function AdminPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingContract, setEditingContract] = useState<Contract | null>(null);
     const [copiedId, setCopiedId] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         // 세션 스토리지에서 인증 상태 확인
@@ -47,8 +48,16 @@ export default function AdminPage() {
         }
     };
 
-    const loadContracts = () => {
-        setContracts(getAllContracts());
+    const loadContracts = async () => {
+        setIsLoading(true);
+        try {
+            const data = await getAllContracts();
+            setContracts(data);
+        } catch (error) {
+            console.error('Error loading contracts:', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleCreateContract = () => {
@@ -61,9 +70,9 @@ export default function AdminPage() {
         setIsModalOpen(true);
     };
 
-    const handleDeleteContract = (id: string) => {
+    const handleDeleteContract = async (id: string) => {
         if (confirm('정말 이 계약서를 삭제하시겠습니까?')) {
-            deleteContract(id);
+            await deleteContract(id);
             loadContracts();
         }
     };
@@ -198,8 +207,13 @@ export default function AdminPage() {
                             </Button>
                         </div>
 
-                        {/* Contract List */}
-                        {contracts.length === 0 ? (
+                        {/* Loading State */}
+                        {isLoading ? (
+                            <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-12 text-center">
+                                <Loader2 className="w-12 h-12 mx-auto text-violet-400 animate-spin mb-4" />
+                                <p className="text-slate-400">계약서를 불러오는 중...</p>
+                            </div>
+                        ) : contracts.length === 0 ? (
                             <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-12 text-center">
                                 <FileText className="w-16 h-16 mx-auto text-slate-600 mb-4" />
                                 <h3 className="text-lg font-medium text-slate-300 mb-2">계약서가 없습니다</h3>

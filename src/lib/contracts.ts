@@ -1,4 +1,5 @@
-// 계약 관련 타입 및 스토리지 관리
+// 계약 관련 타입 및 Supabase 연동
+import { supabase } from './supabase';
 
 export interface CustomerInfo {
     representativeName: string; // 대표자명
@@ -47,8 +48,17 @@ export interface Contract {
     versions: ContractVersion[];
 }
 
-// 로컬 스토리지 키
-const CONTRACTS_STORAGE_KEY = 'makeshort_contracts';
+// DB에서 가져온 데이터 타입
+interface ContractRow {
+    id: string;
+    password: string;
+    created_at: string;
+    updated_at: string;
+    current_version: number;
+    data: {
+        versions: ContractVersion[];
+    };
+}
 
 // 계약서 기본 약관 템플릿
 export const DEFAULT_CONTRACT_TERMS = `
@@ -133,85 +143,123 @@ export const DEFAULT_CONTRACT_TERMS = `
 2. 본 계약의 변경은 양 당사자의 서면 합의에 의해서만 효력을 가진다.
 `.trim();
 
-// 모든 계약 조회
-export function getAllContracts(): Contract[] {
-    if (typeof window === 'undefined') return [];
-    const data = localStorage.getItem(CONTRACTS_STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+// Row를 Contract로 변환
+function rowToContract(row: ContractRow): Contract {
+    return {
+        id: row.id,
+        password: row.password,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        currentVersion: row.current_version,
+        versions: row.data.versions
+    };
 }
 
-// 계약 저장
-export function saveContracts(contracts: Contract[]): void {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem(CONTRACTS_STORAGE_KEY, JSON.stringify(contracts));
+// 모든 계약 조회
+export async function getAllContracts(): Promise<Contract[]> {
+    const { data, error } = await supabase
+        .from('contracts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching contracts:', error);
+        return [];
+    }
+
+    return (data || []).map(rowToContract);
 }
 
 // 계약 ID로 조회
-export function getContractById(id: string): Contract | undefined {
-    const contracts = getAllContracts();
-    return contracts.find(c => c.id === id);
+export async function getContractById(id: string): Promise<Contract | null> {
+    const { data, error } = await supabase
+        .from('contracts')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error) {
+        console.error('Error fetching contract:', error);
+        return null;
+    }
+
+    return data ? rowToContract(data) : null;
 }
 
 // 비밀번호로 계약 조회
-export function getContractByPassword(password: string): Contract | undefined {
-    const contracts = getAllContracts();
-    return contracts.find(c => c.password === password);
+export async function getContractByPassword(password: string): Promise<Contract | null> {
+    const { data, error } = await supabase
+        .from('contracts')
+        .select('*')
+        .eq('password', password)
+        .single();
+
+    if (error) {
+        console.error('Error fetching contract by password:', error);
+        return null;
+    }
+
+    return data ? rowToContract(data) : null;
 }
 
 // 새 계약 생성
-export function createContract(
+export async function createContract(
     customerInfo: CustomerInfo,
     quoteItems: QuoteItem[],
     paymentSchedule: PaymentSchedule,
     contractTerms: string
-): Contract {
-    const contracts = getAllContracts();
-
+): Promise<Contract | null> {
     const id = generateId();
     const password = generatePassword();
     const now = new Date().toISOString();
 
-    const newContract: Contract = {
-        id,
-        password,
+    const version: ContractVersion = {
+        version: 1,
         createdAt: now,
-        updatedAt: now,
-        currentVersion: 1,
-        versions: [{
-            version: 1,
-            createdAt: now,
-            customerInfo,
-            quoteItems,
-            paymentSchedule,
-            contractTerms,
-            status: 'pending'
-        }]
+        customerInfo,
+        quoteItems,
+        paymentSchedule,
+        contractTerms,
+        status: 'pending'
     };
 
-    contracts.push(newContract);
-    saveContracts(contracts);
+    const { data, error } = await supabase
+        .from('contracts')
+        .insert({
+            id,
+            password,
+            created_at: now,
+            updated_at: now,
+            current_version: 1,
+            data: { versions: [version] }
+        })
+        .select()
+        .single();
 
-    return newContract;
+    if (error) {
+        console.error('Error creating contract:', error);
+        return null;
+    }
+
+    return data ? rowToContract(data) : null;
 }
 
 // 계약 업데이트 (새 버전 생성)
-export function updateContract(
+export async function updateContract(
     id: string,
     customerInfo: CustomerInfo,
     quoteItems: QuoteItem[],
     paymentSchedule: PaymentSchedule,
     contractTerms: string
-): Contract | undefined {
-    const contracts = getAllContracts();
-    const index = contracts.findIndex(c => c.id === id);
+): Promise<Contract | null> {
+    // 먼저 기존 계약 조회
+    const existing = await getContractById(id);
+    if (!existing) return null;
 
-    if (index === -1) return undefined;
-
-    const contract = contracts[index];
     const now = new Date().toISOString();
-    const newVersion = contract.currentVersion + 1;
+    const newVersion = existing.currentVersion + 1;
 
-    contract.versions.push({
+    const version: ContractVersion = {
         version: newVersion,
         createdAt: now,
         customerInfo,
@@ -219,53 +267,78 @@ export function updateContract(
         paymentSchedule,
         contractTerms,
         status: 'pending'
-    });
+    };
 
-    contract.currentVersion = newVersion;
-    contract.updatedAt = now;
+    const updatedVersions = [...existing.versions, version];
 
-    contracts[index] = contract;
-    saveContracts(contracts);
+    const { data, error } = await supabase
+        .from('contracts')
+        .update({
+            updated_at: now,
+            current_version: newVersion,
+            data: { versions: updatedVersions }
+        })
+        .eq('id', id)
+        .select()
+        .single();
 
-    return contract;
+    if (error) {
+        console.error('Error updating contract:', error);
+        return null;
+    }
+
+    return data ? rowToContract(data) : null;
 }
 
 // 계약 서명
-export function signContract(id: string, signatureData: string): Contract | undefined {
-    const contracts = getAllContracts();
-    const index = contracts.findIndex(c => c.id === id);
-
-    if (index === -1) return undefined;
-
-    const contract = contracts[index];
-    const currentVersionIndex = contract.versions.findIndex(v => v.version === contract.currentVersion);
-
-    if (currentVersionIndex === -1) return undefined;
+export async function signContract(id: string, signatureData: string): Promise<Contract | null> {
+    // 먼저 기존 계약 조회
+    const existing = await getContractById(id);
+    if (!existing) return null;
 
     const now = new Date().toISOString();
+    const currentVersionIndex = existing.versions.findIndex(
+        v => v.version === existing.currentVersion
+    );
 
-    contract.versions[currentVersionIndex].signature = {
+    if (currentVersionIndex === -1) return null;
+
+    // 현재 버전에 서명 추가
+    existing.versions[currentVersionIndex].signature = {
         signatureData,
         signedAt: now
     };
-    contract.versions[currentVersionIndex].status = 'signed';
-    contract.updatedAt = now;
+    existing.versions[currentVersionIndex].status = 'signed';
 
-    contracts[index] = contract;
-    saveContracts(contracts);
+    const { data, error } = await supabase
+        .from('contracts')
+        .update({
+            updated_at: now,
+            data: { versions: existing.versions }
+        })
+        .eq('id', id)
+        .select()
+        .single();
 
-    return contract;
+    if (error) {
+        console.error('Error signing contract:', error);
+        return null;
+    }
+
+    return data ? rowToContract(data) : null;
 }
 
 // 계약 삭제
-export function deleteContract(id: string): boolean {
-    const contracts = getAllContracts();
-    const index = contracts.findIndex(c => c.id === id);
+export async function deleteContract(id: string): Promise<boolean> {
+    const { error } = await supabase
+        .from('contracts')
+        .delete()
+        .eq('id', id);
 
-    if (index === -1) return false;
-
-    contracts.splice(index, 1);
-    saveContracts(contracts);
+    if (error) {
+        console.error('Error deleting contract:', error);
+        return false;
+    }
 
     return true;
 }

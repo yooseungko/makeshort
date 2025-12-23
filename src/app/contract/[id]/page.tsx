@@ -11,7 +11,7 @@ import {
     formatDate
 } from '@/lib/contracts';
 import { Button } from '@/components/ui/button';
-import { FileText, PenTool, CheckCircle, Lock, Eye, ArrowLeft } from 'lucide-react';
+import { FileText, PenTool, CheckCircle, Lock, Eye, ArrowLeft, User, Check } from 'lucide-react';
 
 type ViewMode = 'login' | 'menu' | 'quote' | 'contract' | 'sign' | 'complete';
 
@@ -23,6 +23,7 @@ export default function ContractPage() {
     const [viewMode, setViewMode] = useState<ViewMode>('login');
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const [showContractConfirmModal, setShowContractConfirmModal] = useState(false);
 
     // Signature canvas
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -160,7 +161,7 @@ export default function ContractPage() {
     const currentVersion = contract.versions.find(v => v.version === contract.currentVersion);
     if (!currentVersion) return null;
 
-    // 비밀번호 입력 화면
+    // 비밀번호 입력 화면 (고객 로그인)
     if (viewMode === 'login') {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
@@ -168,9 +169,9 @@ export default function ContractPage() {
                     <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl p-8">
                         <div className="text-center mb-8">
                             <div className="w-16 h-16 bg-gradient-to-r from-violet-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                <Lock className="w-8 h-8 text-white" />
+                                <User className="w-8 h-8 text-white" />
                             </div>
-                            <h1 className="text-2xl font-bold text-white mb-2">계약서 확인</h1>
+                            <h1 className="text-2xl font-bold text-white mb-2">고객 로그인</h1>
                             <p className="text-slate-400">비밀번호를 입력해주세요</p>
                         </div>
 
@@ -190,7 +191,7 @@ export default function ContractPage() {
                                 type="submit"
                                 className="w-full py-4 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white font-semibold rounded-xl"
                             >
-                                확인
+                                로그인
                             </Button>
                         </form>
                     </div>
@@ -329,18 +330,68 @@ export default function ContractPage() {
                                 </div>
                             </div>
 
-                            {/* 기업 정보 */}
-                            <div className="pt-4 border-t border-slate-700/50 text-center">
-                                <p className="text-lg font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
-                                    메이크숏
-                                </p>
-                                <p className="text-xs text-slate-500 mt-1">
-                                    MAKESHORT
-                                </p>
+                            {/* 견적 확정 버튼 */}
+                            <Button
+                                onClick={() => setShowContractConfirmModal(true)}
+                                className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-xl"
+                            >
+                                <Check className="w-5 h-5 mr-2" />
+                                견적 확정
+                            </Button>
+
+                            {/* 기업 정보 (회사 정보) */}
+                            <div className="pt-4 border-t border-slate-700/50">
+                                <div className="text-center mb-3">
+                                    <p className="text-lg font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+                                        메이크숏
+                                    </p>
+                                    <p className="text-xs text-slate-500 mt-1">
+                                        MAKESHORT
+                                    </p>
+                                </div>
+                                <div className="text-center text-xs text-slate-500 space-y-1">
+                                    <p>테넷컴퍼니 | 대표 고유승, 고유진</p>
+                                    <p>사업자등록번호 654-11-02475</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                {/* 계약 확인 모달 */}
+                {showContractConfirmModal && (
+                    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                        <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full animate-in fade-in zoom-in duration-200">
+                            <div className="text-center mb-6">
+                                <div className="w-16 h-16 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <PenTool className="w-8 h-8 text-white" />
+                                </div>
+                                <h2 className="text-xl font-bold text-white mb-2">계약을 진행하시겠습니까?</h2>
+                                <p className="text-slate-400 text-sm">
+                                    견적 내용을 확인하셨다면, 계약 프로세스를 시작합니다.
+                                </p>
+                            </div>
+                            <div className="flex gap-3">
+                                <Button
+                                    onClick={() => setShowContractConfirmModal(false)}
+                                    variant="outline"
+                                    className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700"
+                                >
+                                    아니오
+                                </Button>
+                                <Button
+                                    onClick={() => {
+                                        setShowContractConfirmModal(false);
+                                        setViewMode('contract');
+                                    }}
+                                    className="flex-1 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600"
+                                >
+                                    예, 계약하기
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
